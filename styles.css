@@ -1,0 +1,221 @@
+html, body{
+    margin: 0px;
+    height: 100%;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+}
+
+
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    width: 100%;
+    height: 100px;
+    background-color: #2B2D42;
+    gap: 50px;
+}
+
+.pagina{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.paginatori{
+    border: none;
+    background-color: #fa1d37;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #EDF2F4;
+    font-weight: 900;
+    font-size: large;
+
+    cursor: pointer;
+}
+
+.counter{
+    color: #EDF2F4;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-right: 10px;
+    font-size: 2vw;
+}
+
+.titolo{
+    color: #EDF2F4;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-left: 10px;
+    font-size: 2vw;
+}
+
+.titolo2{
+    color: #D90429;
+}
+
+.anime{
+    background-color: #2B2D42;
+    width: 100vw;
+    height: 100vh;
+}
+
+.lista_anime{
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 50px;
+    flex-wrap: wrap;
+    width: 100vw;
+    gap: 20px;
+}
+
+img{
+    max-width: 100%;
+    max-height: 300px;
+    height: 651px;
+    width: 460px;
+
+    border-radius: 2%;
+}
+
+.inner{
+    transition: 100ms ease-in-out;
+    cursor: pointer;
+}
+
+
+.inner:hover{
+    transform: scale(1.05)
+}
+
+
+.status{
+    width: 100%;
+    background-color: #d5dbe7;
+    border-radius: 2px;
+
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+}
+
+a{
+    text-decoration: none;
+    color: #EDF2F4;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    text-wrap: wrap;
+    font-size: 1rem;
+}
+
+.inner{
+    width: 200px;
+}
+
+.inner * {
+    pointer-events: none; /* Prevent child elements from capturing focus */
+}
+
+.ep, .ona, .dub, .special{
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 2rem;
+}
+
+
+
+.ep{
+    color:  #238cef;
+}
+
+.ona{
+    color:  #fa1d37;
+}
+
+.dub{
+    color:  #bdac17;
+}
+
+.special{
+    color: #2aa51f;
+}
+
+
+html, body{
+    margin: 0px;
+    height: 100%;
+}
+
+body{
+    height: 100vh;
+    background-color: #2B2D42;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+
+    width: 100%;
+    height: 100px;
+    background-color: #2B2D42;
+    gap: 50px;
+}
+.titolo{
+    color: #EDF2F4;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-left: 10px;
+    font-size: 2vw;
+}
+
+.titolo2{
+    color: #D90429;
+}
+
+.menu{
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #2B2D42;
+}
+
+.episodi{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 260px;
+}
+
+.episodio{
+    background-color: #D90429;
+    color: #EDF2F4;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 2rem;
+    border: none;
+    border-radius: 5px;
+    width: 50px;
+    height: 50px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.resto{
+    display: flex;
+    flex-direction: column;
+}

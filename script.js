@@ -7,6 +7,7 @@ let links = [];
 
 menuStart()
 
+
 function sistemaLink(){
 
     document.querySelectorAll('.inner').forEach(anchor => {
@@ -22,38 +23,63 @@ function sistemaLink(){
 
 }
 
-function menuStart(){
-  fetch('http://localhost:5000/scrape')
+function menuStart() {
+  localStorage.setItem('scrapeUrl', 'https://www.animeworld.so');
+  localStorage.setItem('querySelector', '.widget-body');
+
+  const scrapeUrl = localStorage.getItem('scrapeUrl');
+  const querySelector = localStorage.getItem('querySelector');
+
+  fetch(`http://localhost:5000/scrape?url=${encodeURIComponent(scrapeUrl)}&selector=${encodeURIComponent(querySelector)}`)
   .then(response => response.json())
   .then(data => {
+    console.log('Response from server:', data); // Log the server response
+    if (data.error) {
+      console.error(data.error);
+      document.getElementById('lista_anime').innerHTML = "Error: " + data.error;
+      return;
+    }
 
-    // Crea un elemento temporaneo per contenere la stringa
     tempDiv = document.createElement('div');
-    tempDiv.innerHTML = data.widgetbody;
+    tempDiv.innerHTML = data.content || "";
 
-    
-    // Tutti i poster (anime)
-    posters = tempDiv.querySelectorAll('.poster')
+    if (!tempDiv.children.length) {
+      console.error("No content found in the response");
+      return;
+    }
 
+    posters = tempDiv.querySelectorAll('.poster');
 
-    // Riempo la lista links con tutti i link degli anime
+    if (posters.length === 0) {
+      console.error("No posters found in the scraped content");
+      document.getElementById('lista_anime').innerHTML = "No posters found.";
+      return;
+    }
+
     posters.forEach(element => {
-      links.push('https://www.animeworld.so'+element.getAttribute('href'))
+      links.push('https://www.animeworld.so' + element.getAttribute('href'));
     });
 
-    // Seleziona tutti i div con la classe "common-class" e "different-class"
     allDivs = tempDiv.querySelectorAll('.page');
-    
-    document.getElementById('lista_anime').innerHTML = allDivs[numeroPagina].querySelector('.film-list').innerHTML;
-    
-    document.querySelectorAll('.inner').forEach(element => {
-      element.setAttribute('tabindex', 0)
-      element.setAttribute('onclick', `videoPlayer(${element.getAttribute('onclick')})`)
-    })
-  
-    sistemaLink()
 
+    if (allDivs.length > 0) {
+      document.getElementById('lista_anime').innerHTML = allDivs[numeroPagina].querySelector('.film-list').innerHTML;
+    } else {
+      console.error("No pages found in the scraped content");
+      document.getElementById('lista_anime').innerHTML = "No anime found.";
+      return;
+    }
+
+    document.querySelectorAll('.inner').forEach(element => {
+      element.setAttribute('tabindex', 0);
+      element.setAttribute('onclick', `videoPlayer(${element.getAttribute('onclick')})`);
+    });
+
+    sistemaLink();
   })
+  .catch(error => {
+    console.error('Error:', error);
+  });
 }
 
 function menu(){
@@ -89,17 +115,37 @@ function indietro(){
   }
 }
 
-function videoPlayer(link){
+function videoPlayer(link) {
+  localStorage.setItem('scrapeUrl', link);
+  localStorage.setItem('querySelector', '#download');
 
+  console.log(link);
 
-  fetch(`http://localhost:5000/scrape?url=${link}`)
-  .then(response => response.json())
-  .then(data => {
-    console.log(data);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+  const scrapeUrl = localStorage.getItem('scrapeUrl');
+  const querySelector = localStorage.getItem('querySelector');
 
+  fetch(`http://localhost:5000/scrape?url=${encodeURIComponent(scrapeUrl)}&selector=${encodeURIComponent(querySelector)}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
 
+      // Check if the response contains the expected content
+      if (data.error) {
+        console.error(data.error);
+        return;
+      }
+
+      // Create a temporary div to parse the HTML response
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = data.content;
+
+      console.log(data.content)
+
+      const downloadHref = tempDiv.querySelector('#downloadLink').getAttribute('href');
+        console.log('Download link:', downloadHref); // Log the download link
+        // You can now use downloadHref for further actions, e.g., redirecting the user
+    });
+
+    window.location.href = 'player.html';
+    localStorage.setItem('videoSrc', downloadHref);
 }

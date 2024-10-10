@@ -3,6 +3,7 @@ import cors from 'cors'; // Import cors
 import fetch from 'node-fetch'; // Use import for node-fetch
 import { JSDOM } from 'jsdom';
 
+
 const app = express();
 
 // Enable CORS for all requests
@@ -11,25 +12,31 @@ app.use(cors({
     methods: ['GET'] // Specify allowed methods
 }));
 
+// Route to handle scraping based on query parameters
 app.get('/scrape', async (req, res) => {
+  const { url, selector } = req.query;
+
+  if (!url || !selector) {
+    return res.status(400).json({ error: 'Missing url or selector parameter' });
+  }
+
   try {
-    const response = await fetch('https://www.animeworld.so');
+    const response = await fetch(url);
     const html = await response.text();
     const dom = new JSDOM(html);
     
-    const widgetbody = dom.window.document.querySelector('.widget-body');
+    const element = dom.window.document.querySelectorAll(selector);
     
-    if (widgetbody) {
-      res.json({ widgetbody: widgetbody.innerHTML });
+    if (element) {
+      res.json({ content: element.innerHTML });
     } else {
-      res.json({ error: "widget-body not found" });
+      res.json({ error: "Element not found" });
     }
   } catch (error) {
     console.error(error);
     res.status(500).send("Error during scraping");
   }
 });
-
 
 app.listen(5000, () => {
   console.log('Server listening on port 5000');

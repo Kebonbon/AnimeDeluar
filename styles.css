@@ -1,11 +1,13 @@
 html, body{
     margin: 0px;
-    height: 100%;
+    height: 100vh;
+    width: 100vw;
 }
 
 body{
     display: flex;
     flex-direction: column;
+    margin: 0px;
 }
 
 
@@ -72,13 +74,15 @@ body{
     height: 100vh;
 }
 
-.lista_anime{
+#lista_anime{
     display: flex;
     justify-content: space-evenly;
     margin-top: 50px;
     flex-wrap: wrap;
     width: 100vw;
     gap: 20px;
+
+    transition: all 500ms ease-in-out;
 }
 
 img{
@@ -215,7 +219,32 @@ body{
     margin-bottom: 0px;
 }
 
-.resto{
+#resto{
     display: flex;
+    justify-content: flex-start;
+    align-items: center;
     flex-direction: column;
+
+    width: 100vw;
+    height: 100vh;
+
+    opacity: 0;
+    transition: all 500ms ease-in-out;
+}
+
+#video-player{
+    width: 60vw;
+    margin: 0px;
+    position: relative;
+}
+
+
+#pulsanti a{
+    text-align: center;
+    font-size: 2rem;
+}
+
+#home{
+    font-size: 20px;
+    text-align: center;
 }

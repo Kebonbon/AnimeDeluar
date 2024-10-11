@@ -26,14 +26,14 @@ app.get('/scrape', async (req, res) => {
     const dom = new JSDOM(html);
     
     const element = dom.window.document.querySelectorAll(selector);
-    
-    if (element) {
-      res.json({ content: element.innerHTML });
+
+    if (element.length) {
+      res.json({ content: element[0].innerHTML }); // Ensure we're sending content from the first element
     } else {
       res.json({ error: "Element not found" });
     }
   } catch (error) {
-    console.error(error);
+    console.error("Scraping error:", error); // Check if there's a fetch/network-related error
     res.status(500).send("Error during scraping");
   }
 });

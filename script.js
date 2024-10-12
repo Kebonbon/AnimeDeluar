@@ -97,6 +97,7 @@ function menu(){
 
     document.getElementById('resto').innerHTML = `            
             <div id="videoz"></div>
+            <div id="sezioni"></div>
             <div id="pulsanti"></div>
             `
 
@@ -222,23 +223,60 @@ function videoPlayer(link) {
     <source id="video-source" src="${downloadHref}" type="video/mp4">
     </video>
     `
-    
-      let bottoni;
-      let link_bottone;
-      
-      bottoni = tempDiv.querySelector("ul.episodes.range.active").querySelectorAll(".episode");
-      
-      bottoni.forEach(element => {
+
+      let bottoni = [];
+      let contatoreEP = 0;
+      let quantitaEpisodiSezione = 50;
+      let primoEpisodio;
+      let nuovaSezione = false;
+
+      const fragment = document.createDocumentFragment(); // Create a document fragment
+
+      const episodi = tempDiv.querySelector("div.server.hidden").querySelectorAll(".episode")
+
+      episodi.forEach(
+        element => {
+          
+          const anchor = element.querySelector('a'); // Store the anchor element once
+          
+          if (contatoreEP == 0 || nuovaSezione){
+            primoEpisodio = parseFloat(anchor.textContent);
+            nuovaSezione = false
+          }
+
+          contatoreEP += 1;
+
+
+          const link_bottone = 'https://www.animeworld.so' + anchor.getAttribute('href');
+          
+          anchor.setAttribute('onclick', `cambiaVideo('${link_bottone}')`);
+          anchor.setAttribute('href', '#');
         
-        link_bottone = 'https://www.animeworld.so' + element.querySelector('a').getAttribute('href')
-        
-        element.querySelector('a').setAttribute('onclick', `cambiaVideo('${link_bottone}')`)
-        element.querySelector('a').setAttribute('href', '#')
+          fragment.appendChild(anchor); // Add to the document fragment
+          bottoni.push(element);
 
+          if(contatoreEP%quantitaEpisodiSezione == 0){
+            ultimoEpisodio = parseFloat(anchor.textContent)
 
+            document.getElementById("sezioni").innerHTML += `
+            <button class="sezione">${primoEpisodio} - ${ultimoEpisodio}</button>
+            `
 
-        document.querySelector("#pulsanti").innerHTML += element.innerHTML
-      });
+            nuovaSezione = true;
+          }
+
+          if(contatoreEP == episodi.length && contatoreEP%quantitaEpisodiSezione != 0){
+            ultimoEpisodio = parseFloat(anchor.textContent)
+
+            document.getElementById("sezioni").innerHTML += `
+            <button class="sezione">${primoEpisodio} - ${ultimoEpisodio}</button>
+            `          
+          }
+
+              });
+
+    document.querySelector("#pulsanti").appendChild(fragment);
+
 
     });
   }

@@ -248,3 +248,26 @@ body{
     font-size: 20px;
     text-align: center;
 }
+
+#sezioni{
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+
+    margin-top: 10px;
+    width: 60vw;
+    gap: 30px;
+    row-gap: 5px;
+    flex-wrap: wrap;
+}
+
+.sezione{
+    background-color: #D90429;
+    color: #d5dbe7;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 30px;
+    border-radius: 5px;
+    border: black solid 2px;
+    text-wrap: nowrap;
+}
+

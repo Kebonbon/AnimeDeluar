@@ -5,6 +5,7 @@ let allDivsStringa;
 let posters;
 let links = [];
 
+let episodioScelto;
 
 menuStart()
 
@@ -17,9 +18,11 @@ function sistemaLink(){
 
     document.querySelectorAll('.inner').forEach(anchor => {
       // Get the current href value
-      let currentHref = anchor.querySelector('a').getAttribute('href');
+
+      anchora = anchor.querySelector('a')
+      let currentHref = anchora.getAttribute('href');
       
-      anchor.setAttribute('onclick', `videoPlayer('${'https://www.animeworld.so' + currentHref}')`);
+      anchor.setAttribute('onclick', `videoPlayer('${'https://www.animeworld.so' + currentHref}', ${anchor.querySelector('.ep').textContent.slice(3)})`);
       anchor.removeAttribute('href');
 
       anchor.querySelectorAll('a').forEach(link => {link.removeAttribute('href')});
@@ -90,14 +93,17 @@ function menuStart() {
 
 function menu(){
 
+  bottoni = [];
   document.getElementById('resto').style.opacity = 0;
 
   setTimeout(()=>{  
     document.getElementById('lista_anime').style.opacity = 1;
 
     document.getElementById('resto').innerHTML = `            
-            <div id="videoz"></div>
-            <div id="sezioni"></div>
+            <div id="contenutigrandi">
+                <div id="sezioni"></div>
+                <div id="videoz"></div>
+            </div>
             <div id="pulsanti"></div>
             `
 
@@ -154,7 +160,10 @@ function indietro(){
   }
 }
 
-function videoPlayer(link) {
+let bottoni = [];
+function videoPlayer(link, numEpisodio) {
+  episodioScelto = numEpisodio;
+
   document.getElementById('resto').style = `    
   display: flex;
   justify-content: flex-start;
@@ -171,14 +180,19 @@ function videoPlayer(link) {
   document.getElementById('pulsanti').style = `
     margin-top: 20px;
     display: grid;
-    grid-template-rows: 1fr 1fr;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     padding: 15px;
 
-    gap: 30px;
+    gap: 20px;
     border: solid;
     background-color: #fa1d37;
     border-radius: 20px;
+
+    width: 80vw;
+    height: 20vh;
+
+    row-gap: 2px;
 
     margin-left: 400px;
     margin-right: 400px;
@@ -224,11 +238,11 @@ function videoPlayer(link) {
     </video>
     `
 
-      let bottoni = [];
       let contatoreEP = 0;
       let quantitaEpisodiSezione = 50;
       let primoEpisodio;
       let nuovaSezione = false;
+      let sezioneGiusta = false;
 
       const fragment = document.createDocumentFragment(); // Create a document fragment
 
@@ -249,41 +263,92 @@ function videoPlayer(link) {
 
           const link_bottone = 'https://www.animeworld.so' + anchor.getAttribute('href');
           
-          anchor.setAttribute('onclick', `cambiaVideo('${link_bottone}')`);
+          anchor.setAttribute('onclick', `cambiaVideo('${link_bottone}', '${anchor.textContent}')`);
           anchor.setAttribute('href', '#');
-        
+          anchor.setAttribute('id', `${anchor.textContent}`);
+
+          if (anchor.textContent == episodioScelto){
+            anchor.classList.add("selected");
+          }
+
           fragment.appendChild(anchor); // Add to the document fragment
-          bottoni.push(element);
+          bottoni.push(anchor);
+
+          if(anchor.textContent == numEpisodio){
+            sezioneGiusta = true;
+          }
 
           if(contatoreEP%quantitaEpisodiSezione == 0){
             ultimoEpisodio = parseFloat(anchor.textContent)
 
             document.getElementById("sezioni").innerHTML += `
-            <button class="sezione">${primoEpisodio} - ${ultimoEpisodio}</button>
+            <button class="sezione" onclick="cambiaSezioni('${primoEpisodio}', '${ultimoEpisodio}')">${primoEpisodio} - ${ultimoEpisodio}</button>
             `
 
             nuovaSezione = true;
+
+            if(sezioneGiusta && numEpisodio >= primoEpisodio && numEpisodio <= ultimoEpisodio){
+              sezioneGiusta = false;
+              cambiaSezioni(primoEpisodio, ultimoEpisodio);
+            }
           }
 
-          if(contatoreEP == episodi.length && contatoreEP%quantitaEpisodiSezione != 0){
+          if(contatoreEP == episodi.length && contatoreEP%quantitaEpisodiSezione != 0 && contatoreEP > 50){
             ultimoEpisodio = parseFloat(anchor.textContent)
 
             document.getElementById("sezioni").innerHTML += `
-            <button class="sezione">${primoEpisodio} - ${ultimoEpisodio}</button>
-            `          
+            <button class="sezione" onclick="cambiaSezioni('${primoEpisodio}', '${ultimoEpisodio}')">${primoEpisodio} - ${ultimoEpisodio}</button>
+            `
+
+            if(sezioneGiusta && numEpisodio >= primoEpisodio && numEpisodio <= ultimoEpisodio){
+              sezioneGiusta = false;
+              cambiaSezioni(primoEpisodio, ultimoEpisodio);
+            }
           }
+        });
 
-              });
-
-    document.querySelector("#pulsanti").appendChild(fragment);
-
-
+        if(episodi.length <= 50){
+          document.getElementById("sezioni").style = `display: none;`
+          document.querySelector("#pulsanti").appendChild(fragment);
+        }
     });
   }
 
-function cambiaVideo(link_bottone){
+function cambiaSezioni(primoEpisodio, ultimoEpisodio){
+  console.log(bottoni);
+  
+  document.querySelector("#pulsanti").innerHTML = ''; // Clear previous content
+
+  bottoni.slice(primoEpisodio-1, ultimoEpisodio).forEach(element => {
+
+    if(element.textContent == episodioScelto){
+      element.classList.add("selected");
+    }else{
+      try{
+        element.classList.remove("selected");
+      }
+      catch(err){
+      }
+    }
+
+    const htmlString = element.outerHTML || element; // Convert DOM element to string if necessary
+    document.querySelector("#pulsanti").innerHTML += htmlString;
+
+  });
+}
 
 
+function cambiaVideo(link_bottone, numEpisodio){
+  episodioScelto = numEpisodio;
+  console.log(episodioScelto);
+  
+  try {
+    document.querySelectorAll(".selected").forEach(element => element.classList.remove("selected"));
+  }
+  catch(err) {    
+  }
+  
+  document.getElementById(`${numEpisodio}`).setAttribute("class","selected");
   
   fetch(`http://localhost:5000/scrape?url=${encodeURIComponent(link_bottone)}&selector=${encodeURIComponent('#body')}`)
   .then(response => response.json())
@@ -301,6 +366,8 @@ function cambiaVideo(link_bottone){
     <source id="video-source" src="${downloadHref}" type="video/mp4">
     </video>
     `
+
+    
   })  
 }
 
@@ -317,7 +384,6 @@ function removeFullscreen() {
 
 function playVideo(){
   const videoPlayer = document.getElementById('video-player');
-  console.log(videoPlayer)
   if (videoPlayer !== null) {
   videoPlayer.play();
   }
@@ -327,6 +393,10 @@ let fullscreenMode = false;
 let buttonPressed0 = false;
 let buttonPressed1 = false;
 let buttonPressed2 = false;
+
+let buttonPressed4 = false;
+let buttonPressed5 = false;
+
 let buttonPressed6 = false;
 let buttonPressed7 = false;
 
@@ -347,18 +417,20 @@ function checkController() {
     }
 
     const X = gamepad.buttons[2];
-    if (X.pressed && !buttonPressed2) {
-      buttonPressed2 = true;
-      if (!fullscreenMode) {
-        fullscreen();
-      } else {
-        removeFullscreen();
+    try{
+      if (X.pressed && !buttonPressed2) {
+        buttonPressed2 = true;
+        if (!fullscreenMode) {
+          fullscreen();
+        } else {
+          removeFullscreen();
+        }
+        fullscreenMode = !fullscreenMode;
+      } else if (!X.pressed && buttonPressed2) {
+        buttonPressed2 = false;
       }
-      fullscreenMode = !fullscreenMode;
-    } else if (!X.pressed && buttonPressed2) {
-      buttonPressed2 = false;
-    }
-
+    }catch(err){}
+      
     const L2 = gamepad.buttons[6];
     if (L2.pressed && !buttonPressed6) {
       buttonPressed6 = true;
@@ -375,8 +447,29 @@ function checkController() {
       buttonPressed7 = false;
     }
 
+    const L1 = gamepad.buttons[4];
+    try{
+      if (L1.pressed && !buttonPressed4) {
+        buttonPressed4 = true;
 
+        //ISTRUZIONI L1
 
+      } else if (!L1.pressed && buttonPressed4) {
+        buttonPressed4 = false;
+      }
+    }catch(err){}
+
+    const R1 = gamepad.buttons[5];
+    try{
+      if (R1.pressed && !buttonPressed5) {
+        buttonPressed5 = true;
+
+        //ISTRUZIONI R1
+
+      } else if (!R1.pressed && buttonPressed5) {
+        buttonPressed5 = false;
+      }
+    }catch(err){}
 
   }
 

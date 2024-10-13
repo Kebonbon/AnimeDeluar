@@ -473,7 +473,7 @@ function checkController() {
 
   }
 
-  requestAnimationFrame(checkController); // Continuously check for input
+  requestAnimationFrame(checkController);
 }
 
 checkController();

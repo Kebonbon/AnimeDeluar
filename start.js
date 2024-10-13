@@ -2,38 +2,61 @@ import { spawn } from 'child_process';
 import { resolve } from 'path';
 import open from 'open';
 
-// 1. Esegui il comando `node server.js` in una cartella specifica
-const folderPath = resolve('C:/Users/KEVIN/Desktop/Programmazione/Github/AnimeDeluar'); // Sostituisci con il percorso della cartella
+// Path to the folder where server.js and live-server will run
+const folderPath = resolve('C:/Users/KEVIN/Desktop/Programmazione/Github/AnimeDeluar');
+
+// 1. Esegui il comando `node server.js` nella cartella specificata
 const serverCommand = 'server.js';
 
-
-// Modifica per utilizzare spawn
-const serverProcess = spawn('node', [serverCommand], {
+// Start server.js using node
+const serverJsProcess = spawn('node', [serverCommand], {
     cwd: folderPath,
-    stdio: 'inherit', // Per ottenere output direttamente nel terminale
+    stdio: 'inherit', // To get output directly in the terminal
 });
 
-serverProcess.on('error', (error) => {
+serverJsProcess.on('error', (error) => {
     console.error(`Errore durante l'esecuzione di server.js: ${error.message}`);
 });
 
-serverProcess.on('exit', (code) => {
+serverJsProcess.on('exit', (code) => {
     if (code !== 0) {
-        console.error(`Processo terminato con codice ${code}`);
+        console.error(`Processo server.js terminato con codice ${code}`);
     } else {
-        console.log('Server terminato correttamente');
+        console.log('Server server.js terminato correttamente');
     }
 });
 
-// 2. Apri Chrome su una pagina specifica
-const url = 'http://127.0.0.1:5500/index.html'; // Sostituisci con la tua URL
+// 2. Esegui il comando `npx live-server` su una porta specifica nella stessa cartella
+const liveServerProcess = spawn('cmd.exe', ['/c', 'npx', 'live-server', '--port=5500', '--no-browser'], {
+    cwd: folderPath,
+    stdio: 'inherit', // To get output directly in the terminal
+});
 
-// Specifica il percorso completo per Chrome
+liveServerProcess.on('error', (error) => {
+    console.error(`Errore durante l'esecuzione di live-server: ${error.message}`);
+});
+
+liveServerProcess.on('exit', (code) => {
+    if (code !== 0) {
+        console.error(`Processo live-server terminato con codice ${code}`);
+    } else {
+        console.log('Server live-server terminato correttamente');
+    }
+});
+
+// 3. Apri Chrome sulla pagina già aperta in modalità fullscreen
+const localUrl = 'http://127.0.0.1:5500/index.html'; // URL della tua pagina
 const chromePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe'; // Modifica se necessario
-open(url, { app: { name: chromePath, arguments: ['--start-fullscreen'] } })
-    .then(() => {
-        console.log('Chrome aperto in fullscreen!');
-    })
-    .catch(err => {
-        console.error(`Errore durante l'apertura di Chrome: ${err}`);
-    });
+
+open(localUrl, { 
+    app: { 
+        name: chromePath, 
+        arguments: ['--start-fullscreen', '--app=' + localUrl] // Apri come applicazione in fullscreen
+    } 
+})
+.then(() => {
+    console.log('Chrome aperto in fullscreen!');
+})
+.catch(err => {
+    console.error(`Errore durante l'apertura di Chrome: ${err}`);
+});

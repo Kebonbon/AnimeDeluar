@@ -9,11 +9,6 @@ let episodioScelto;
 
 menuStart()
 
-window.addEventListener("gamepadconnected", (event) => {
-  console.log("Controller connected:", event.gamepad.id);
-  checkController();
-});
-
 function sistemaLink(){
 
     document.querySelectorAll('.inner').forEach(anchor => {
@@ -33,6 +28,7 @@ function sistemaLink(){
 
 //npm install node-fetch@latest
 
+
 function menuStart() {
   localStorage.setItem('scrapeUrl', 'https://www.animeworld.so');
   localStorage.setItem('querySelector', '.widget-body');
@@ -40,55 +36,64 @@ function menuStart() {
   const scrapeUrl = localStorage.getItem('scrapeUrl');
   const querySelector = localStorage.getItem('querySelector');
 
-  fetch(`http://localhost:5000/scrape?url=${encodeURIComponent(scrapeUrl)}&selector=${encodeURIComponent(querySelector)}`)
-  .then(response => response.json())
+  fetch(`http://192.168.1.39:5000/scrape?url=${encodeURIComponent(scrapeUrl)}&selector=${encodeURIComponent(querySelector)}`)
+  .then(response => {console.log(response) 
+    return response})
   .then(data => {
-    if (data.error) {
-      console.error(data.error);
-      document.getElementById('lista_anime').innerHTML = "Error: " + data.error;
-      return;
-    }
 
-    tempDiv = document.createElement('div');
-    tempDiv.innerHTML = data.content || "";
-
-    if (!tempDiv.children.length) {
-      console.error("No content found in the response");
-      return;
-    }
-
-    posters = tempDiv.querySelectorAll('.poster');
-
-    if (posters.length === 0) {
-      console.error("No posters found in the scraped content");
-      document.getElementById('lista_anime').innerHTML = "No posters found.";
-      return;
-    }
-
-    posters.forEach(element => {
-      links.push('https://www.animeworld.so' + element.getAttribute('href'));
+    
+    data.json().then( data => {
+      
+      console.log(data)
+      if (data.error) {
+        console.error(data.error);
+        document.getElementById('lista_anime').innerHTML = "Error: " + data.error;
+        return;
+      }
+  
+      tempDiv = document.createElement('div');
+      tempDiv.innerHTML = data.content || "";
+  
+      if (!tempDiv.children.length) {
+        console.error("No content found in the response");
+        return;
+      }
+  
+      posters = tempDiv.querySelectorAll('.poster');
+  
+      if (posters.length === 0) {
+        console.error("No posters found in the scraped content");
+        document.getElementById('lista_anime').innerHTML = "No posters found.";
+        return;
+      }
+  
+      posters.forEach(element => {
+        links.push('https://www.animeworld.so' + element.getAttribute('href'));
+      });
+  
+      allDivs = tempDiv.querySelectorAll('.page');
+  
+      if (allDivs.length > 0) {
+        document.getElementById('lista_anime').innerHTML = allDivs[numeroPagina].querySelector('.film-list').innerHTML;
+      } else {
+        console.error("No pages found in the scraped content");
+        document.getElementById('lista_anime').innerHTML = "No anime found.";
+        return;
+      }
+  
+      document.querySelectorAll('.inner').forEach(element => {
+        element.setAttribute('tabindex', 0);
+        element.setAttribute('onclick', `videoPlayer(${element.getAttribute('onclick')})`);
+      });
+  
+      sistemaLink();
+    })
+    .catch(error => {
+      console.error('Error:', error);
     });
 
-    allDivs = tempDiv.querySelectorAll('.page');
 
-    if (allDivs.length > 0) {
-      document.getElementById('lista_anime').innerHTML = allDivs[numeroPagina].querySelector('.film-list').innerHTML;
-    } else {
-      console.error("No pages found in the scraped content");
-      document.getElementById('lista_anime').innerHTML = "No anime found.";
-      return;
-    }
-
-    document.querySelectorAll('.inner').forEach(element => {
-      element.setAttribute('tabindex', 0);
-      element.setAttribute('onclick', `videoPlayer(${element.getAttribute('onclick')})`);
-    });
-
-    sistemaLink();
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+    })
 }
 
 function menu(){
@@ -128,7 +133,6 @@ function menu(){
     element.setAttribute('tabindex', 0)
     element.setAttribute('onclick', `videoPlayer(${element.getAttribute('onclick')})`)
   })
-
   sistemaLink()
 }
 
@@ -216,7 +220,7 @@ function videoPlayer(link, numEpisodio) {
   const scrapeUrl = localStorage.getItem('scrapeUrl');
   const querySelector = localStorage.getItem('querySelector');
   
-  fetch(`http://localhost:5000/scrape?url=${encodeURIComponent(scrapeUrl)}&selector=${encodeURIComponent(querySelector)}`)
+  fetch(`http://192.168.1.39:5000/scrape?url=${encodeURIComponent(scrapeUrl)}&selector=${encodeURIComponent(querySelector)}`)
   .then(response => response.json())
   .then(data => {
     
@@ -350,7 +354,7 @@ function cambiaVideo(link_bottone, numEpisodio){
   
   document.getElementById(`${numEpisodio}`).setAttribute("class","selected");
   
-  fetch(`http://localhost:5000/scrape?url=${encodeURIComponent(link_bottone)}&selector=${encodeURIComponent('#body')}`)
+  fetch(`http://192.168.1.39:5000/scrape?url=${encodeURIComponent(link_bottone)}&selector=${encodeURIComponent('#body')}`)
   .then(response => response.json())
   .then(data => {
 
@@ -390,92 +394,131 @@ function playVideo(){
 }
 
 let fullscreenMode = false;
-let buttonPressed0 = false;
-let buttonPressed1 = false;
-let buttonPressed2 = false;
 
-let buttonPressed4 = false;
-let buttonPressed5 = false;
+//Ascolta tastiera
+document.addEventListener("keydown", (event) => {
+  const keyName = event.key;
+  const keyCode = event.keyCode;
 
-let buttonPressed6 = false;
-let buttonPressed7 = false;
+  if (keyName) {
+    console.log("Hai premuto", keyName);
 
-function checkController() {
-  const gamepad = navigator.getGamepads()[0];
-  if (gamepad) {
-
-      gamepad.buttons.forEach((button, index) => {
-        if (button.pressed){
-            console.log(`Button ${index} pressed`);}})
-
-    const B = gamepad.buttons[1];
-    if (B.pressed && !buttonPressed1) {
-      buttonPressed1 = true;
+    // HOME
+    if (keyName === "MediaStop" || keyName === "m") {
       menu();
-    } else if (!B.pressed && buttonPressed1) {
-      buttonPressed1 = false;
     }
 
-    const X = gamepad.buttons[2];
-    try{
-      if (X.pressed && !buttonPressed2) {
-        buttonPressed2 = true;
-        if (!fullscreenMode) {
-          fullscreen();
-        } else {
-          removeFullscreen();
-        }
-        fullscreenMode = !fullscreenMode;
-      } else if (!X.pressed && buttonPressed2) {
-        buttonPressed2 = false;
+    // FULLSCREEN
+    else if (keyName === "MediaRecord" || keyName === "f") {
+      if (!fullscreenMode) {
+        fullscreen();
+      } else {
+        removeFullscreen();
       }
-    }catch(err){}
-      
-    const L2 = gamepad.buttons[6];
-    if (L2.pressed && !buttonPressed6) {
-      buttonPressed6 = true;
-      indietro();
-    } else if (!L2.pressed && buttonPressed6) {
-      buttonPressed6 = false;
+      fullscreenMode = !fullscreenMode;
     }
 
-    const R2 = gamepad.buttons[7];
-    if (R2.pressed && !buttonPressed7) {
-      buttonPressed7 = true;
+    // AVANTI
+    else if (keyName === "MediaFastForward" || keyName === "a") {
       avanti();
-    } else if (!R2.pressed && buttonPressed7) {
-      buttonPressed7 = false;
     }
 
-    const L1 = gamepad.buttons[4];
-    try{
-      if (L1.pressed && !buttonPressed4) {
-        buttonPressed4 = true;
+    // INDIETRO
+    else if (keyName === "MediaRewind" || keyName === "i") {
+      indietro();
+    }    
 
-        //ISTRUZIONI L1
-
-      } else if (!L1.pressed && buttonPressed4) {
-        buttonPressed4 = false;
+    // CLICK SIMULATION ON SELECTED
+    else if (keyName == "ColorF3Blue" || keyName === "k") {
+      const selected = document.querySelector("#lista_anime .selected");
+      if (selected) {
+        selected.click(); // Trigger the click event
       }
-    }catch(err){}
+      selected.classList.remove("selected")
+    }
 
-    const R1 = gamepad.buttons[5];
-    try{
-      if (R1.pressed && !buttonPressed5) {
-        buttonPressed5 = true;
 
-        //ISTRUZIONI R1
+    // SELEZIONE E NAVIGAZIONE
+    const listaAnime = document.querySelector("#lista_anime");
 
-      } else if (!R1.pressed && buttonPressed5) {
-        buttonPressed5 = false;
+    if (listaAnime) {
+      const selected = listaAnime.querySelector(".selected");
+
+      if (!selected) {
+        listaAnime.querySelector(".inner")?.classList.add("selected");
+      } else {
+
+          if (keyName === "ColorF0Red" || keyName === "ArrowLeft") {
+            selected.cardMoveHorizont("prev", listaAnime);
+          }else 
+          if (keyName === "ColorF2Yellow" || keyName === "ArrowUp") {
+            selected.cardMoveHorizont("up", listaAnime);
+          }else 
+          if (keyName === "ColorF1Green" || keyName === "ArrowRight") {
+            selected.cardMoveHorizont("next", listaAnime);
+          }else 
+          if (keyName === "" || keyName === "ArrowDown") {
+            selected.cardMoveHorizont("down", listaAnime);
+          }
+        event.preventDefault();
       }
-    }catch(err){}
-
+    }
   }
+});
 
-  requestAnimationFrame(checkController);
-}
+HTMLElement.prototype.cardMoveHorizont = function (direction, container) {
+  const items = Array.from(container.querySelectorAll('.inner'));
+  const currentIndex = items.indexOf(this);
+  const columns = 8; // Cambia questo valore se hai una griglia diversa
 
-checkController();
+  let nextIndex = currentIndex;
 
+  switch (direction) {
+    case "prev":
+      if ((currentIndex % columns) === 0) {
+        // Vai all'ultima colonna della riga precedente
+        const target = currentIndex - 1;
+        if (target >= 0) nextIndex = target;
+      } else {
+        nextIndex = currentIndex - 1;
+      }
+      break;
 
+    case "next":
+      if ((currentIndex % columns) === columns - 1 || currentIndex + 1 >= items.length) {
+        // Vai alla prima colonna della riga successiva
+        const target = currentIndex + (columns - (currentIndex % columns));
+        if (target < items.length) nextIndex = target;
+      } else {
+        nextIndex = currentIndex + 1;
+      }
+      break;
+
+      case "up":
+        if (currentIndex - columns >= 0) {
+          nextIndex = currentIndex - columns;
+        } else {
+          // Torna all'ultima riga, stessa colonna se possibile
+          const lastRowStart = items.length - (items.length % columns || columns);
+          nextIndex = lastRowStart + (currentIndex % columns);
+          if (nextIndex >= items.length) {
+            nextIndex -= columns;
+          }
+        }
+        break;
+      
+      case "down":
+        if (currentIndex + columns < items.length) {
+          nextIndex = currentIndex + columns;
+        } else {
+          // Torna alla prima riga, stessa colonna
+          nextIndex = currentIndex % columns;
+        }
+        break;
+        }
+
+  if (nextIndex !== currentIndex) {
+    this.classList.remove('selected');
+    items[nextIndex].classList.add('selected');
+  }
+};

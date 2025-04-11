@@ -10,6 +10,14 @@ body{
     margin: 0px;
 }
 
+.selected{
+    background-color: #238cef;
+    color: #fa1d37;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    border-radius: 5px;
+}
 
 .header{
     display: flex;
@@ -76,21 +84,18 @@ body{
 
 #lista_anime{
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     margin-top: 50px;
     flex-wrap: wrap;
     width: 100vw;
-    gap: 20px;
+    gap: 40px;
 
     transition: all 500ms ease-in-out;
 }
 
 img{
     max-width: 100%;
-    max-height: 300px;
-    height: 651px;
-    width: 460px;
-
+    height: 100%;
     border-radius: 2%;
 }
 
@@ -123,12 +128,12 @@ a{
     font-style: italic;
     font-weight: 900;
     text-wrap: wrap;
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 
 .inner{
     position: relative;
-    width: 200px;
+    width: 130px;
 }
 
 .inner * {
@@ -138,10 +143,8 @@ a{
 .ep, .ona, .dub, .special{
     margin-left: 10px;
     margin-right: 10px;
-    font-size: 2rem;
+    font-size: 1.3rem;
 }
-
-
 
 .ep{
     color:  #238cef;
@@ -228,8 +231,8 @@ body{
     flex-direction: column;
 
     width: 100vw;
-    height: 100vh;
-
+    height: 60vh;
+    
     opacity: 0;
     transition: all 500ms ease-in-out;
 }
@@ -272,14 +275,6 @@ body{
     border-radius: 5px;
     border: black solid 2px;
     text-wrap: nowrap;
-}
-
-.selected{
-    background-color: #d5dbe7;
-    color: #fa1d37;
-    padding-left: 5px;
-    padding-right: 5px;
-    border-radius: 5px;
 }
 
 #contenutigrandi{
